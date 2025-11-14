@@ -7,20 +7,24 @@
     Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
     mc:Ignorable="d">
 
-	<Grid x:Name="ContentArea">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="48" />
-			<RowDefinition Height="*" />
-		</Grid.RowDefinitions>
+	<StackPanel Orientation="Horizontal" Margin="20" >
 
-		<TextBlock
-            Grid.Row="0"
-            x:Uid="Main_Title"
-            Style="{StaticResource PageTitleStyle}" />
+		<!-- IFileDialog -->
+		<StackPanel >
 
-		<Grid Grid.Row="1">
+		</StackPanel>
 
-		</Grid>
+		<!-- WinUI 3 -->
+		<StackPanel >
 
-	</Grid>
+			<Border Background="Gold" Padding="5" >
+				<TextBlock Text="WinUI 3" />
+			</Border>
+
+			<Button Content="FileOpenPicker" Command="{x:Bind ViewModel.ButtonFileOpenPickerClickedCommand}" Margin="0,20,0,0" />
+
+		</StackPanel>
+
+	</StackPanel>
+
 </Page>
