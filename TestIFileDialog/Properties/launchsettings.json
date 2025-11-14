@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "TestIFileDialog (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "TestIFileDialog (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
