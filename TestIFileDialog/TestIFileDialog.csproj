@@ -46,6 +46,10 @@
 		<Folder Include="Views\MainWindows\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\TestIFileDialog.CsWin32\TestIFileDialog.CsWin32.csproj" />
+	</ItemGroup>
+
 	<PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
 		<HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
 	</PropertyGroup>

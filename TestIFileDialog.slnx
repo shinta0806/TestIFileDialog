@@ -2,6 +2,7 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
+  <Project Path="TestIFileDialog.CsWin32/TestIFileDialog.CsWin32.csproj" Id="d082a10c-b6b7-46a7-b210-bde99136652a" />
   <Project Path="TestIFileDialog/TestIFileDialog.csproj">
     <Platform Project="x64" />
     <Deploy />

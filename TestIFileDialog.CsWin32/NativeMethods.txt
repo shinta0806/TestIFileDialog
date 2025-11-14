@@ -1,0 +1,10 @@
+// モジュール
+Kernel32.*
+Shell32.*
+User32.*
+
+// モジュール外インターフェース
+IFileDialog
+IFileOpenDialog
+FileOpenDialog
+FileSaveDialog
