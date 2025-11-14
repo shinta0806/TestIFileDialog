@@ -1,8 +1,9 @@
 using Microsoft.UI.Xaml;
 
+using TestIFileDialog.Views.MainWindows;
+
 namespace TestIFileDialog;
 
-// To learn more about WinUI 3, see https://docs.microsoft.com/windows/apps/winui/winui3/.
 public partial class App : Application
 {
 	public static WindowEx MainWindow { get; } = new MainWindow();
@@ -19,7 +20,7 @@ public partial class App : Application
 		// https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
 	}
 
-	protected async override void OnLaunched(LaunchActivatedEventArgs args)
+	protected override void OnLaunched(LaunchActivatedEventArgs args)
 	{
 		base.OnLaunched(args);
 		MainWindow.Activate();

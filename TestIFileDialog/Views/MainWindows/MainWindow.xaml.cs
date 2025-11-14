@@ -1,6 +1,4 @@
-using TestIFileDialog.Views;
-
-namespace TestIFileDialog;
+namespace TestIFileDialog.Views.MainWindows;
 
 public sealed partial class MainWindow : WindowEx
 {
@@ -10,6 +8,6 @@ public sealed partial class MainWindow : WindowEx
 
 		AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets/WindowIcon.ico"));
 		Content = new MainPage();
-		Title = "AppDisplayName";
+		Title = "IFileDialog のテスト";
 	}
 }
