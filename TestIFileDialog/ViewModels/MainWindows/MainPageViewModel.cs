@@ -10,9 +10,10 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.UI.Xaml;
+
 using Windows.Storage;
 using Windows.Storage.Pickers;
+
 using WinRT.Interop;
 
 namespace TestIFileDialog.ViewModels;
@@ -50,9 +51,9 @@ public partial class MainPageViewModel : ObservableRecipient
 		{
 			FileOpenPicker fileOpenPicker = new();
 			InitializeWithWindow.Initialize(fileOpenPicker, App.MainWindow.GetWindowHandle());
+			fileOpenPicker.FileTypeFilter.Add("*");
 			fileOpenPicker.FileTypeFilter.Add(".jpg");
 			fileOpenPicker.FileTypeFilter.Add(".png");
-			fileOpenPicker.FileTypeFilter.Add("*");
 
 			StorageFile? file = await fileOpenPicker.PickSingleFileAsync();
 			if (file == null)
@@ -60,7 +61,31 @@ public partial class MainPageViewModel : ObservableRecipient
 				return;
 			}
 
-			await App.MainWindow.ShowMessageDialogAsync(file.Path, "開く");
+			await App.MainWindow.ShowMessageDialogAsync(file.Path, "ファイルを開く");
+		}
+		catch (Exception ex)
+		{
+			await App.MainWindow.ShowMessageDialogAsync(ex.Message, "エラー");
+		}
+	}
+	#endregion
+
+	#region ButtonFolderPickerClickedCommand
+	[RelayCommand]
+	private async Task ButtonFolderPickerClicked()
+	{
+		try
+		{
+			FolderPicker folderPicker = new();
+			InitializeWithWindow.Initialize(folderPicker, App.MainWindow.GetWindowHandle());
+
+			StorageFolder? folder = await folderPicker.PickSingleFolderAsync();
+			if (folder == null)
+			{
+				return;
+			}
+
+			await App.MainWindow.ShowMessageDialogAsync(folder.Path, "フォルダーを開く");
 		}
 		catch (Exception ex)
 		{
