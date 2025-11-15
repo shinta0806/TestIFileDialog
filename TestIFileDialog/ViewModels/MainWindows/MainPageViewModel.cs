@@ -93,4 +93,30 @@ public partial class MainPageViewModel : ObservableRecipient
 		}
 	}
 	#endregion
+
+	#region ButtonFileSavePickerClickedCommand
+	[RelayCommand]
+	private async Task ButtonFileSavePickerClicked()
+	{
+		try
+		{
+			FileSavePicker fileSavePicker = new();
+			InitializeWithWindow.Initialize(fileSavePicker, App.MainWindow.GetWindowHandle());
+			fileSavePicker.FileTypeChoices.Add("JPEG 画像", [".jpg"]);
+			fileSavePicker.FileTypeChoices.Add("PNG 画像", [".png"]);
+
+			StorageFile? file = await fileSavePicker.PickSaveFileAsync();
+			if (file == null)
+			{
+				return;
+			}
+
+			await App.MainWindow.ShowMessageDialogAsync(file.Path, "ファイルを保存");
+		}
+		catch (Exception ex)
+		{
+			await App.MainWindow.ShowMessageDialogAsync(ex.Message, "エラー");
+		}
+	}
+	#endregion
 }
