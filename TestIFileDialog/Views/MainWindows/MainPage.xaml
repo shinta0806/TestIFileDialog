@@ -13,7 +13,7 @@
 		<StackPanel >
 
 			<Border Background="Gold" Padding="5" >
-				<TextBlock Text="IFileDialog" />
+				<TextBlock Text="IFileDialog（Win32 API）" />
 			</Border>
 
 			<Button Content="IFileOpenDialog（ファイル）" Command="{x:Bind ViewModel.ButtonIFileOpenDialogFileClickedCommand}" Margin="0,20,0,0" />
@@ -26,7 +26,7 @@
 		<StackPanel Margin="20,0,0,0" >
 
 			<Border Background="Gold" Padding="5" >
-				<TextBlock Text="Windows.Storage.Pickers" />
+				<TextBlock Text="Windows.Storage.Pickers（WinUI 3 旧版）" />
 			</Border>
 
 			<Button Content="FileOpenPicker" Command="{x:Bind ViewModel.ButtonFileOpenPickerClickedCommand}" Margin="0,20,0,0" />
@@ -41,7 +41,7 @@
 		<StackPanel Margin="20,0,0,0" >
 
 			<Border Background="Gold" Padding="5" >
-				<TextBlock Text="Microsoft.Windows.Storage.Pickers" />
+				<TextBlock Text="Microsoft.Windows.Storage.Pickers（WinUI 3 新版）" />
 			</Border>
 
 			<Button Content="FileOpenPicker" Command="{x:Bind ViewModel.ButtonFileOpenPicker2ClickedCommand}" Margin="0,20,0,0" />
