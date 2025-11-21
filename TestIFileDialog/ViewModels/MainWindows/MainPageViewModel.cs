@@ -48,16 +48,16 @@ public partial class MainPageViewModel : ObservableRecipient
 	// コマンド
 	// --------------------------------------------------------------------
 
-	#region ButtonIFileOpenDialogClickedCommand
+	#region ButtonIFileOpenDialogFileClickedCommand
 	[RelayCommand]
-	private async Task ButtonIFileOpenDialogClicked()
+	private async Task ButtonIFileOpenDialogFileClicked()
 	{
 		try
 		{
 			String filter = "すべてのファイル|*.*|JPEG 画像|*.jpg;*.jpeg|PNG 画像|*.png";
 			UInt32 filterIndex = 1;
 			Guid guid = new("F25059A4-FB2C-4A03-B3A0-A8E4A800EEBB");
-			FILEOPENDIALOGOPTIONS options = FILEOPENDIALOGOPTIONS.FOS_NOCHANGEDIR | FILEOPENDIALOGOPTIONS.FOS_PATHMUSTEXIST | FILEOPENDIALOGOPTIONS.FOS_FILEMUSTEXIST;
+			FILEOPENDIALOGOPTIONS options = FILEOPENDIALOGOPTIONS.FOS_NOCHANGEDIR | FILEOPENDIALOGOPTIONS.FOS_PATHMUSTEXIST | FILEOPENDIALOGOPTIONS.FOS_FILEMUSTEXIST/* | FILEOPENDIALOGOPTIONS.FOS_ALLOWMULTISELECT*/;
 			String[]? pathes = ShowFileOpenDialog(filter, ref filterIndex, options, guid);
 			if (pathes == null)
 			{
@@ -65,6 +65,31 @@ public partial class MainPageViewModel : ObservableRecipient
 			}
 
 			await App.MainWindow.ShowMessageDialogAsync(String.Join('\n', pathes), "ファイルを開く");
+		}
+		catch (Exception ex)
+		{
+			await App.MainWindow.ShowMessageDialogAsync(ex.Message, "エラー");
+		}
+	}
+	#endregion
+
+	#region ButtonIFileOpenDialogFolderClickedCommand
+	[RelayCommand]
+	private async Task ButtonIFileOpenDialogFolderClicked()
+	{
+		try
+		{
+			String filter = String.Empty;
+			UInt32 filterIndex = 1;
+			Guid guid = new("BEBA95F9-C249-4ABA-964F-AFEAE4C1D47B");
+			FILEOPENDIALOGOPTIONS options = FILEOPENDIALOGOPTIONS.FOS_NOCHANGEDIR | FILEOPENDIALOGOPTIONS.FOS_PATHMUSTEXIST | FILEOPENDIALOGOPTIONS.FOS_PICKFOLDERS;
+			String[]? pathes = ShowFileOpenDialog(filter, ref filterIndex, options, guid);
+			if (pathes == null)
+			{
+				return;
+			}
+
+			await App.MainWindow.ShowMessageDialogAsync(String.Join('\n', pathes), "フォルダーを開く");
 		}
 		catch (Exception ex)
 		{

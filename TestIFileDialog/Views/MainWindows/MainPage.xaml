@@ -16,7 +16,9 @@
 				<TextBlock Text="IFileDialog" />
 			</Border>
 
-			<Button Content="IFileOpenDialog" Command="{x:Bind ViewModel.ButtonIFileOpenDialogClickedCommand}" Margin="0,20,0,0" />
+			<Button Content="IFileOpenDialog（ファイル）" Command="{x:Bind ViewModel.ButtonIFileOpenDialogFileClickedCommand}" Margin="0,20,0,0" />
+
+			<Button Content="IFileOpenDialog（フォルダー）" Command="{x:Bind ViewModel.ButtonIFileOpenDialogFolderClickedCommand}" Margin="0,20,0,0" />
 
 		</StackPanel>
 
