@@ -11,8 +11,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-using Windows.Storage;
-
 using WinRT.Interop;
 
 namespace TestIFileDialog.ViewModels;
@@ -48,13 +46,15 @@ public partial class MainPageViewModel : ObservableRecipient
 	{
 		try
 		{
+			// Microsoft 名前空間との対比のために FileOpenPicker コンストラクターを使用しているが、
+			// WindowEx.CreateOpenFilePicker() を使用すれば 1 行削減可能（FolderPicker や FileSavePicker も同様）
 			Windows.Storage.Pickers.FileOpenPicker fileOpenPicker = new();
 			InitializeWithWindow.Initialize(fileOpenPicker, App.MainWindow.GetWindowHandle());
 			fileOpenPicker.FileTypeFilter.Add("*");
 			fileOpenPicker.FileTypeFilter.Add(".jpg");
 			fileOpenPicker.FileTypeFilter.Add(".png");
 
-			StorageFile? file = await fileOpenPicker.PickSingleFileAsync();
+			Windows.Storage.StorageFile? file = await fileOpenPicker.PickSingleFileAsync();
 			if (file == null)
 			{
 				return;
@@ -78,7 +78,7 @@ public partial class MainPageViewModel : ObservableRecipient
 			Windows.Storage.Pickers.FolderPicker folderPicker = new();
 			InitializeWithWindow.Initialize(folderPicker, App.MainWindow.GetWindowHandle());
 
-			StorageFolder? folder = await folderPicker.PickSingleFolderAsync();
+			Windows.Storage.StorageFolder? folder = await folderPicker.PickSingleFolderAsync();
 			if (folder == null)
 			{
 				return;
@@ -104,7 +104,7 @@ public partial class MainPageViewModel : ObservableRecipient
 			fileSavePicker.FileTypeChoices.Add("JPEG 画像", [".jpg"]);
 			fileSavePicker.FileTypeChoices.Add("PNG 画像", [".png"]);
 
-			StorageFile? file = await fileSavePicker.PickSaveFileAsync();
+			Windows.Storage.StorageFile? file = await fileSavePicker.PickSaveFileAsync();
 			if (file == null)
 			{
 				return;
@@ -137,6 +137,28 @@ public partial class MainPageViewModel : ObservableRecipient
 			}
 
 			await App.MainWindow.ShowMessageDialogAsync(file.Path, "ファイルを開く");
+		}
+		catch (Exception ex)
+		{
+			await App.MainWindow.ShowMessageDialogAsync(ex.Message, "エラー");
+		}
+	}
+	#endregion
+
+	#region ButtonFolderPicker2ClickedCommand
+	[RelayCommand]
+	private async Task ButtonFolderPicker2Clicked()
+	{
+		try
+		{
+			Microsoft.Windows.Storage.Pickers.FolderPicker folderPicker = new(App.MainWindow.AppWindow.Id);
+			Microsoft.Windows.Storage.Pickers.PickFolderResult? folder = await folderPicker.PickSingleFolderAsync();
+			if (folder == null)
+			{
+				return;
+			}
+
+			await App.MainWindow.ShowMessageDialogAsync(folder.Path, "フォルダーを開く");
 		}
 		catch (Exception ex)
 		{

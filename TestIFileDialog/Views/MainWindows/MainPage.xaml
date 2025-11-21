@@ -30,17 +30,17 @@
 		</StackPanel>
 
 		<!-- Microsoft.Windows.Storage.Pickers -->
-		<StackPanel >
+		<StackPanel Margin="20,0,0,0" >
 
 			<Border Background="Gold" Padding="5" >
-				<TextBlock Text="Windows.Storage.Pickers" />
+				<TextBlock Text="Microsoft.Windows.Storage.Pickers" />
 			</Border>
 
 			<Button Content="FileOpenPicker" Command="{x:Bind ViewModel.ButtonFileOpenPicker2ClickedCommand}" Margin="0,20,0,0" />
 
-			<!--
-			<Button Content="FolderPicker" Command="{x:Bind ViewModel.ButtonFolderPickerClickedCommand}" Margin="0,20,0,0" />
+			<Button Content="FolderPicker" Command="{x:Bind ViewModel.ButtonFolderPicker2ClickedCommand}" Margin="0,20,0,0" />
 
+			<!--
 			<Button Content="FileSavePicker" Command="{x:Bind ViewModel.ButtonFileSavePickerClickedCommand}" Margin="0,20,0,0" />
 			-->
 
