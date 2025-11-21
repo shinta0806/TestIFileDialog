@@ -40,9 +40,7 @@
 
 			<Button Content="FolderPicker" Command="{x:Bind ViewModel.ButtonFolderPicker2ClickedCommand}" Margin="0,20,0,0" />
 
-			<!--
-			<Button Content="FileSavePicker" Command="{x:Bind ViewModel.ButtonFileSavePickerClickedCommand}" Margin="0,20,0,0" />
-			-->
+			<Button Content="FileSavePicker" Command="{x:Bind ViewModel.ButtonFileSavePicker2ClickedCommand}" Margin="0,20,0,0" />
 
 		</StackPanel>
 
