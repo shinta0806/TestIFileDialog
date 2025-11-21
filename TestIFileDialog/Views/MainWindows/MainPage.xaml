@@ -12,10 +12,16 @@
 		<!-- IFileDialog -->
 		<StackPanel >
 
+			<Border Background="Gold" Padding="5" >
+				<TextBlock Text="IFileDialog" />
+			</Border>
+
+			<Button Content="IFileOpenDialog" Command="{x:Bind ViewModel.ButtonIFileOpenDialogClickedCommand}" Margin="0,20,0,0" />
+
 		</StackPanel>
 
 		<!-- Windows.Storage.Pickers -->
-		<StackPanel >
+		<StackPanel Margin="20,0,0,0" >
 
 			<Border Background="Gold" Padding="5" >
 				<TextBlock Text="Windows.Storage.Pickers" />
