@@ -409,7 +409,6 @@ public partial class MainPageViewModel : ObservableRecipient
 	{
 		// IShellItem.GetDisplayName() が CoTaskMem なのでみんなそれに合わせる
 		List<nint> coTaskMemories = [];
-		void* shellInitial = null;
 
 		// finally 用の try
 		try
@@ -463,10 +462,6 @@ public partial class MainPageViewModel : ObservableRecipient
 		}
 		finally
 		{
-			if (shellInitial != null)
-			{
-				((IShellItem*)shellInitial)->Release();
-			}
 			foreach (nint ptr in coTaskMemories)
 			{
 				Marshal.FreeCoTaskMem(ptr);
