@@ -15,7 +15,6 @@ using CommunityToolkit.Mvvm.Input;
 
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.System.Com;
 using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.Shell.Common;
 
@@ -290,29 +289,33 @@ public partial class MainPageViewModel : ObservableRecipient
 	/// <returns>選択されたファイル群のパス（キャンセルされた場合は null）</returns>
 	private unsafe String[]? ShowFileOpenDialog(String filter, ref UInt32 filterIndex, FILEOPENDIALOGOPTIONS options, Guid guid)
 	{
-		IFileOpenDialog* openDialog = null;
-		IShellItemArray* shellItemArray = null;
+		IFileOpenDialog? openDialog = null;
+		IShellItemArray? shellItemArray = null;
 
 		// finally 用の try
 		try
 		{
 			// ダイアログ生成
-			HRESULT result = PInvoke.CoCreateInstance(typeof(FileOpenDialog).GUID, null, CLSCTX.CLSCTX_INPROC_SERVER, out openDialog);
-			result.ThrowOnFailure();
+			openDialog = Activator.CreateInstance(typeof(FileOpenDialog)) as IFileOpenDialog;
+			if (openDialog == null)
+			{
+				throw new Exception("FileOpenDialog を作成できませんでした。");
+			}
 
 			// 表示
-			if (!ShowFileDialogCore((IFileDialog*)openDialog, filter, ref filterIndex, options, guid))
+			if (!ShowFileDialogCore(openDialog, filter, ref filterIndex, options, guid))
 			{
 				return null;
 			}
 
 			// 結果取得
-			result = openDialog->GetResults(&shellItemArray);
+			HRESULT result;
+			result = openDialog.GetResults(out shellItemArray);
 			if (result.Failed)
 			{
 				return null;
 			}
-			result = shellItemArray->GetCount(out UInt32 numPathes);
+			result = shellItemArray.GetCount(out UInt32 numPathes);
 			if (result.Failed)
 			{
 				return null;
@@ -320,14 +323,14 @@ public partial class MainPageViewModel : ObservableRecipient
 			String[] pathes = new String[numPathes];
 			for (UInt32 i = 0; i < numPathes; i++)
 			{
-				IShellItem* iShellResult;
-				result = shellItemArray->GetItemAt(i, &iShellResult);
+				IShellItem iShellResult;
+				result = shellItemArray.GetItemAt(i, out iShellResult);
 				if (result.Failed)
 				{
 					continue;
 				}
 				String? path = ShellItemToPath(iShellResult);
-				iShellResult->Release();
+				Marshal.ReleaseComObject(iShellResult);
 				if (String.IsNullOrEmpty(path))
 				{
 					continue;
@@ -340,11 +343,11 @@ public partial class MainPageViewModel : ObservableRecipient
 		{
 			if (shellItemArray != null)
 			{
-				shellItemArray->Release();
+				Marshal.ReleaseComObject(shellItemArray);
 			}
 			if (openDialog != null)
 			{
-				openDialog->Release();
+				Marshal.ReleaseComObject(openDialog);
 			}
 		}
 	}
@@ -359,15 +362,18 @@ public partial class MainPageViewModel : ObservableRecipient
 	/// <returns>選択されたファイルのパス（キャンセルされた場合は null）</returns>
 	public unsafe String? ShowFileSaveDialog(String filter, ref UInt32 filterIndex, FILEOPENDIALOGOPTIONS options, Guid guid)
 	{
-		IFileDialog* saveDialog = null;
-		IShellItem* shellResult = null;
+		IFileDialog? saveDialog = null;
+		IShellItem? shellResult = null;
 
 		// finally 用の try
 		try
 		{
 			// ダイアログ生成
-			HRESULT result = PInvoke.CoCreateInstance(typeof(FileSaveDialog).GUID, null, CLSCTX.CLSCTX_INPROC_SERVER, out saveDialog);
-			result.ThrowOnFailure();
+			saveDialog = Activator.CreateInstance(typeof(FileSaveDialog)) as IFileDialog;
+			if (saveDialog == null)
+			{
+				throw new Exception("FileSaveDialog を作成できませんでした。");
+			}
 
 			// 表示
 			if (!ShowFileDialogCore(saveDialog, filter, ref filterIndex, options, guid))
@@ -376,7 +382,8 @@ public partial class MainPageViewModel : ObservableRecipient
 			}
 
 			// 結果取得
-			result = saveDialog->GetResult(&shellResult);
+			HRESULT result;
+			result = saveDialog.GetResult(out shellResult);
 			if (result.Failed)
 			{
 				return null;
@@ -387,11 +394,11 @@ public partial class MainPageViewModel : ObservableRecipient
 		{
 			if (shellResult != null)
 			{
-				shellResult->Release();
+				Marshal.ReleaseComObject(shellResult);
 			}
 			if (saveDialog != null)
 			{
-				saveDialog->Release();
+				Marshal.ReleaseComObject(saveDialog);
 			}
 		}
 	}
@@ -405,21 +412,20 @@ public partial class MainPageViewModel : ObservableRecipient
 	/// <param name="options">オプション（複数選択など）</param>
 	/// <param name="guid">最後にアクセスしたフォルダーなどが GUID 別に記憶される</param>
 	/// <returns>true: 決定, false: キャンセル</returns>
-	private unsafe Boolean ShowFileDialogCore(IFileDialog* fileDialog, String filter, ref UInt32 filterIndex, FILEOPENDIALOGOPTIONS options, Guid guid)
+	private unsafe Boolean ShowFileDialogCore(IFileDialog fileDialog, String filter, ref UInt32 filterIndex, FILEOPENDIALOGOPTIONS options, Guid guid)
 	{
 		// IShellItem.GetDisplayName() が CoTaskMem なのでみんなそれに合わせる
 		List<nint> coTaskMemories = [];
-		void* shellInitial = null;
 
 		// finally 用の try
 		try
 		{
 			// GUID
 			HRESULT result;
-			fileDialog->SetClientGuid(guid);
+			fileDialog.SetClientGuid(guid);
 
 			// オプション
-			fileDialog->SetOptions(options);
+			fileDialog.SetOptions(options);
 
 			// フィルター
 			(String[] filters, Boolean checkFilter) = ShowFileDialogCheckFilter(filter);
@@ -441,20 +447,20 @@ public partial class MainPageViewModel : ObservableRecipient
 						Marshal.StructureToPtr(spec, (nint)specsSpanPtr, false);
 					}
 				}
-				fileDialog->SetFileTypes(specsSpan);
-				fileDialog->SetFileTypeIndex(filterIndex);
+				fileDialog.SetFileTypes(specsSpan);
+				fileDialog.SetFileTypeIndex(filterIndex);
 			}
 
 			// ダイアログを表示
 			HWND hWnd = (HWND)WindowNative.GetWindowHandle(App.MainWindow);
-			result = fileDialog->Show(hWnd);
+			result = fileDialog.Show(hWnd);
 			if (result.Failed)
 			{
 				return false;
 			}
 
 			// フィルターインデックス書き戻し
-			result = fileDialog->GetFileTypeIndex(out UInt32 filterIndexResult);
+			result = fileDialog.GetFileTypeIndex(out UInt32 filterIndexResult);
 			if (result.Succeeded)
 			{
 				filterIndex = filterIndexResult;
@@ -463,10 +469,6 @@ public partial class MainPageViewModel : ObservableRecipient
 		}
 		finally
 		{
-			if (shellInitial != null)
-			{
-				((IShellItem*)shellInitial)->Release();
-			}
 			foreach (nint ptr in coTaskMemories)
 			{
 				Marshal.FreeCoTaskMem(ptr);
@@ -503,10 +505,10 @@ public partial class MainPageViewModel : ObservableRecipient
 	/// </summary>
 	/// <param name="shellResult"></param>
 	/// <returns></returns>
-	private unsafe String? ShellItemToPath(IShellItem* shellResult)
+	private unsafe String? ShellItemToPath(IShellItem shellResult)
 	{
 		PWSTR pathPwstr;
-		HRESULT result = shellResult->GetDisplayName(SIGDN.SIGDN_FILESYSPATH, &pathPwstr);
+		HRESULT result = shellResult.GetDisplayName(SIGDN.SIGDN_FILESYSPATH, &pathPwstr);
 		if (result.Failed)
 		{
 			return null;

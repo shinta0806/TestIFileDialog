@@ -1,7 +1,7 @@
 {
 	"$schema": "https://aka.ms/CsWin32.schema.json",
 	"public": true,
-	"allowMarshaling": false,
+	"allowMarshaling": true,
 	"comInterop": {
 		"preserveSigMethods": [ "*" ]
 	}
