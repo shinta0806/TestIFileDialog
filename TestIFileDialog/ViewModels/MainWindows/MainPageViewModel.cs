@@ -57,7 +57,8 @@ public partial class MainPageViewModel : ObservableRecipient
 			String filter = "すべてのファイル|*.*|JPEG 画像|*.jpg;*.jpeg|PNG 画像|*.png";
 			UInt32 filterIndex = 1;
 			Guid guid = new("F25059A4-FB2C-4A03-B3A0-A8E4A800EEBB");
-			FILEOPENDIALOGOPTIONS options = FILEOPENDIALOGOPTIONS.FOS_NOCHANGEDIR | FILEOPENDIALOGOPTIONS.FOS_PATHMUSTEXIST | FILEOPENDIALOGOPTIONS.FOS_FILEMUSTEXIST/* | FILEOPENDIALOGOPTIONS.FOS_ALLOWMULTISELECT*/;
+			FILEOPENDIALOGOPTIONS options = FILEOPENDIALOGOPTIONS.FOS_NOCHANGEDIR | FILEOPENDIALOGOPTIONS.FOS_PATHMUSTEXIST
+				| FILEOPENDIALOGOPTIONS.FOS_FILEMUSTEXIST/* | FILEOPENDIALOGOPTIONS.FOS_ALLOWMULTISELECT*/;
 			String[]? pathes = ShowFileOpenDialog(filter, ref filterIndex, options, guid);
 			if (pathes == null)
 			{
@@ -82,7 +83,8 @@ public partial class MainPageViewModel : ObservableRecipient
 			String filter = String.Empty;
 			UInt32 filterIndex = 1;
 			Guid guid = new("BEBA95F9-C249-4ABA-964F-AFEAE4C1D47B");
-			FILEOPENDIALOGOPTIONS options = FILEOPENDIALOGOPTIONS.FOS_NOCHANGEDIR | FILEOPENDIALOGOPTIONS.FOS_PATHMUSTEXIST | FILEOPENDIALOGOPTIONS.FOS_PICKFOLDERS;
+			FILEOPENDIALOGOPTIONS options = FILEOPENDIALOGOPTIONS.FOS_NOCHANGEDIR | FILEOPENDIALOGOPTIONS.FOS_PATHMUSTEXIST
+				| FILEOPENDIALOGOPTIONS.FOS_PICKFOLDERS;
 			String[]? pathes = ShowFileOpenDialog(filter, ref filterIndex, options, guid);
 			if (pathes == null)
 			{
@@ -90,6 +92,31 @@ public partial class MainPageViewModel : ObservableRecipient
 			}
 
 			await App.MainWindow.ShowMessageDialogAsync(String.Join('\n', pathes), "フォルダーを開く");
+		}
+		catch (Exception ex)
+		{
+			await App.MainWindow.ShowMessageDialogAsync(ex.Message, "エラー");
+		}
+	}
+	#endregion
+
+	#region ButtonIFileSaveDialogClickedCommand
+	[RelayCommand]
+	private async Task ButtonIFileSaveDialogClicked()
+	{
+		try
+		{
+			String filter = "JPEG 画像|*.jpg;*.jpeg|PNG 画像|*.png";
+			UInt32 filterIndex = 1;
+			Guid guid = new("FF2B2DC3-654E-4FA8-9730-3BBC47A32522");
+			FILEOPENDIALOGOPTIONS options = FILEOPENDIALOGOPTIONS.FOS_NOCHANGEDIR | FILEOPENDIALOGOPTIONS.FOS_PATHMUSTEXIST
+				| FILEOPENDIALOGOPTIONS.FOS_OVERWRITEPROMPT | FILEOPENDIALOGOPTIONS.FOS_NOREADONLYRETURN;
+			String? path = ShowFileSaveDialog(filter, ref filterIndex, options, guid);
+			if (path == null)
+			{
+				return;
+			}
+			await App.MainWindow.ShowMessageDialogAsync(path, "ファイルを保存");
 		}
 		catch (Exception ex)
 		{
@@ -318,6 +345,53 @@ public partial class MainPageViewModel : ObservableRecipient
 			if (openDialog != null)
 			{
 				openDialog->Release();
+			}
+		}
+	}
+
+	/// <summary>
+	/// 名前を付けて保存ダイアログを表示
+	/// </summary>
+	/// <param name="filter">（ShowFileDialogCore() 参照）</param>
+	/// <param name="filterIndex">（ShowFileDialogCore() 参照）</param>
+	/// <param name="options">（ShowFileDialogCore() 参照）</param>
+	/// <param name="guid">（ShowFileDialogCore() 参照）</param>
+	/// <returns>選択されたファイルのパス（キャンセルされた場合は null）</returns>
+	public unsafe String? ShowFileSaveDialog(String filter, ref UInt32 filterIndex, FILEOPENDIALOGOPTIONS options, Guid guid)
+	{
+		IFileDialog* saveDialog = null;
+		IShellItem* shellResult = null;
+
+		// finally 用の try
+		try
+		{
+			// ダイアログ生成
+			HRESULT result = PInvoke.CoCreateInstance(typeof(FileSaveDialog).GUID, null, CLSCTX.CLSCTX_INPROC_SERVER, out saveDialog);
+			result.ThrowOnFailure();
+
+			// 表示
+			if (!ShowFileDialogCore(saveDialog, filter, ref filterIndex, options, guid))
+			{
+				return null;
+			}
+
+			// 結果取得
+			result = saveDialog->GetResult(&shellResult);
+			if (result.Failed)
+			{
+				return null;
+			}
+			return ShellItemToPath(shellResult);
+		}
+		finally
+		{
+			if (shellResult != null)
+			{
+				shellResult->Release();
+			}
+			if (saveDialog != null)
+			{
+				saveDialog->Release();
 			}
 		}
 	}

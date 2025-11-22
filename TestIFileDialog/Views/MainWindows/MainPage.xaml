@@ -20,6 +20,8 @@
 
 			<Button Content="IFileOpenDialog（フォルダー）" Command="{x:Bind ViewModel.ButtonIFileOpenDialogFolderClickedCommand}" Margin="0,20,0,0" />
 
+			<Button Content="IFileSaveDialog" Command="{x:Bind ViewModel.ButtonIFileSaveDialogClickedCommand}" Margin="0,20,0,0" />
+
 		</StackPanel>
 
 		<!-- Windows.Storage.Pickers -->
