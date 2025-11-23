@@ -426,7 +426,6 @@ public partial class MainPageViewModel : ObservableRecipient
 			{
 				Int32 numFilters = filters.Length / 2;
 				nint specs = Marshal.AllocCoTaskMem(Marshal.SizeOf<COMDLG_FILTERSPEC>() * numFilters);
-				ReadOnlySpan<COMDLG_FILTERSPEC> specsSpan = new((void*)specs, numFilters);
 				coTaskMemories.Add(specs);
 				for (Int32 i = 0; i < numFilters; i++)
 				{
@@ -435,12 +434,9 @@ public partial class MainPageViewModel : ObservableRecipient
 					(PCWSTR specPcwstr, nint specPtr) = CreateCoMemPcwstr(filters[i * 2 + 1]);
 					coTaskMemories.Add(specPtr);
 					COMDLG_FILTERSPEC spec = new() { pszName = namePcwstr, pszSpec = specPcwstr };
-					fixed (void* specsSpanPtr = specsSpan[i..])
-					{
-						Marshal.StructureToPtr(spec, (nint)specsSpanPtr, false);
-					}
+					Marshal.StructureToPtr(spec, specs + Marshal.SizeOf<COMDLG_FILTERSPEC>() * i, false);
 				}
-				fileDialog->SetFileTypes(specsSpan);
+				fileDialog->SetFileTypes((UInt32)numFilters, (COMDLG_FILTERSPEC*)specs);
 				fileDialog->SetFileTypeIndex(filterIndex);
 			}
 
